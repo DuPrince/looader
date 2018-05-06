@@ -1,4 +1,4 @@
-# Lomenu UI
+# Looader
 Loading screen solution for Unity engine. 
 
 Latest version: [v1.3b - Click for changes & showcase](https://youtu.be/D7ziPl0lAlA)
