@@ -36,14 +36,21 @@ public class LO_LoadingScreen : MonoBehaviour
     public Animator objectAnimator;
     private bool isAnimPlayed = false;
 
+    [Header("VIRTUAL LOADING")]
+    [Tooltip("Second(s)")]
+    public float virtualLoadingTimer = 5;
+    private float vltTimer;
+
     [Header("SETTINGS")]
+    public bool enableVirtualLoading = false;
     public bool enableTitleDesc = true;
     public bool enableRandomHints = true;
     public bool enableRandomImages = true;
     public bool enablePressAnyKey = true;
     public string titleText;
     public string titleDescText;
-    public float fadingAnimationSpeed = 2.0f;
+    [Tooltip("Set this to 25 if you want instant fading")]
+    [Range(0.1f, 25)] public float fadingAnimationSpeed = 2.0f;
 
     private bool isHintAlphaZero;
  
@@ -107,42 +114,80 @@ public class LO_LoadingScreen : MonoBehaviour
  
     void Update()
     {
-        // Update loading status
-		progressBar.value = loadingProcess.progress;
-		status.text = Mathf.Round(progressBar.value * 100f).ToString() + "%";
-         
-        // If loading is complete
-		if (loadingProcess.isDone && enablePressAnyKey == false)
+        try
         {
-            // Fade out
-			canvasAlpha.alpha -= fadingAnimationSpeed * Time.deltaTime;
-             
-            // If fade out is complete, then disable the object
-			if (canvasAlpha.alpha <= 0)
-            {
-                gameObject.SetActive(false);
-            }
+            // Update loading status
+            progressBar.value = loadingProcess.progress;
+            status.text = Mathf.Round(progressBar.value * 100f).ToString() + "%";
         }
-        else // If loading proccess isn't completed
+
+        catch
         {
-            // Start Fade in
-			canvasAlpha.alpha += fadingAnimationSpeed * Time.deltaTime;
-             
-            // If loading screen is visible
-			if (canvasAlpha.alpha >= 1)
+            Debug.Log("No progress bar");
+        }
+         
+        // Do virtual loading if it's enabled --- and yes, a lot ifs...
+        if (enableVirtualLoading == true)
+        {
+            vltTimer += Time.deltaTime;
+
+            if (vltTimer >= virtualLoadingTimer && loadingProcess.isDone)
             {
-                // We're good to go. New scene is on! :)
                 loadingProcess.allowSceneActivation = true;
+                canvasAlpha.alpha -= fadingAnimationSpeed * Time.deltaTime;
+
+                if (canvasAlpha.alpha <= 0)
+                {
+                    gameObject.SetActive(false);
+                }
+            }
+
+            else
+            {
+                canvasAlpha.alpha += fadingAnimationSpeed * Time.deltaTime;
+
+                if (canvasAlpha.alpha >= 1 && vltTimer >= virtualLoadingTimer)
+                {
+                    loadingProcess.allowSceneActivation = true;
+                }
             }
         }
 
-        // If loading is completed and PAK feature enabled, show Press Any Key panel
-        if (progressBar.value == 1 && enablePressAnyKey == true && isAnimPlayed == false) 
-		{
-			objectAnimator.enabled = true;
-			objectAnimator.Play ("PAK Fade-in");
-			isAnimPlayed = true;
-		}
+        else
+        {
+            // If loading is complete
+            if (loadingProcess.isDone && enablePressAnyKey == false)
+            {
+                // Fade out
+                canvasAlpha.alpha -= fadingAnimationSpeed * Time.deltaTime;
+
+                // If fade out is complete, then disable the object
+                if (canvasAlpha.alpha <= 0)
+                {
+                    gameObject.SetActive(false);
+                }
+            }
+            else // If loading proccess isn't completed
+            {
+                // Start Fade in
+                canvasAlpha.alpha += fadingAnimationSpeed * Time.deltaTime;
+
+                // If loading screen is visible
+                if (canvasAlpha.alpha >= 1)
+                {
+                    // We're good to go. New scene is on! :)
+                    loadingProcess.allowSceneActivation = true;
+                }
+            }
+
+            // If loading is completed and PAK feature enabled, show Press Any Key panel
+            if (progressBar.value == 1 && enablePressAnyKey == true && isAnimPlayed == false)
+            {
+                objectAnimator.enabled = true;
+                objectAnimator.Play("PAK Fade-in");
+                isAnimPlayed = true;
+            }
+        }
 
         // Check if random images are enabled
         if (enableRandomImages == true)

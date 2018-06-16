@@ -2,24 +2,24 @@
 using UnityEditor;
 using UnityEngine;
 
-public class LooaderEditor : EditorWindow {
+public class LooaderEditorWindow : EditorWindow {
 
-	private static LooaderEditor instance = null;
+	private static LooaderEditorWindow instance = null;
 
 	[MenuItem("Tools/Looader/Create Looader Manager")]
 	static void CreateLooaderSystem()
 	{
-		instance = Instantiate(Resources.Load<GameObject>("Looader Manager")).GetComponent<LooaderEditor>();
+		instance = Instantiate(Resources.Load<GameObject>("Looader Manager")).GetComponent<LooaderEditorWindow>();
 	}
 
 	[MenuItem("Tools/Looader/Create Trigger Object")]
 	static void CreateTriggerObject()
 	{
-		instance = Instantiate(Resources.Load<GameObject>("Trigger Object")).GetComponent<LooaderEditor>();
+		instance = Instantiate(Resources.Load<GameObject>("Trigger Object")).GetComponent<LooaderEditorWindow>();
 	}
 
 	public static void OnCustomWindow()
 	{
-		EditorWindow.GetWindow(typeof(LooaderEditor));
+		EditorWindow.GetWindow(typeof(LooaderEditorWindow));
 	}
 }
